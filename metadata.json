@@ -1,0 +1,5 @@
+{
+  "name": "Knip & Stijl - Luxe Kapsalon Amsterdam",
+  "description": "Professionele, moderne en luxe website voor kapsalon Knip & Stijl in Amsterdam. Ontdek onze diensten, ontmoet ons team en boek direct online.",
+  "requestFramePermissions": ["geolocation"]
+}
