@@ -15,11 +15,10 @@ import StyleAdvice from './components/StyleAdvice';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Promotions from './components/Promotions';
-import AdminDashboard from './components/AdminDashboard';
 
-function LandingPage() {
+export default function App() {
   return (
-    <>
+    <div className="min-h-screen bg-black font-sans selection:bg-gold-500 selection:text-black">
       <Navbar />
       <main>
         <Hero />
@@ -32,19 +31,6 @@ function LandingPage() {
       </main>
       <Footer />
       <Promotions />
-    </>
-  );
-}
-
-export default function App() {
-  return (
-    <Router>
-      <div className="min-h-screen bg-black font-sans selection:bg-gold-500 selection:text-black">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-        </Routes>
-      </div>
-    </Router>
+    </div>
   );
 }

@@ -19,54 +19,26 @@ const TIME_SLOTS = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00
 export default function Booking() {
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
   const { register, handleSubmit, watch, formState: { errors } } = useForm<BookingFormData>();
 
-  const selectedDate = watch('date');
-  const selectedStylist = watch('stylistId');
+  const onSubmit = (data: BookingFormData) => {
+    const service = SERVICES.find(s => s.id === data.serviceId)?.name || data.serviceId;
+    const stylist = TEAM.find(t => t.id === data.stylistId)?.name || 'Geen voorkeur';
+    
+    const message = `Hallo, ik wil graag een afspraak maken:
+- Dienst: ${service}
+- Stylist: ${stylist}
+- Datum: ${data.date}
+- Tijd: ${data.time}
+- Naam: ${data.name}
+- E-mail: ${data.email}
+- Telefoon: ${data.phone}`;
 
-  // Fetch occupied slots when date or stylist changes
-  useEffect(() => {
-    if (selectedDate) {
-      const fetchOccupied = async () => {
-        try {
-          const res = await fetch(`/api/bookings/occupied?date=${selectedDate}&stylistId=${selectedStylist || ''}`);
-          if (res.ok) {
-            const data = await res.json();
-            setOccupiedSlots(data);
-          }
-        } catch (err) {
-          console.error("Failed to fetch occupied slots", err);
-        }
-      };
-      fetchOccupied();
-    }
-  }, [selectedDate, selectedStylist]);
-
-  const onSubmit = async (data: BookingFormData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      
-      const result = await res.json();
-      
-      if (res.ok) {
-        setIsSubmitted(true);
-      } else {
-        setError(result.error || "Er is iets misgegaan.");
-      }
-    } catch (err) {
-      setError("Kon geen verbinding maken met de server.");
-    } finally {
-      setLoading(false);
-    }
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/31612345678?text=${encodedMessage}`; // Replace with real number
+    
+    window.open(whatsappUrl, '_blank');
+    setIsSubmitted(true);
   };
 
   if (isSubmitted) {
@@ -80,13 +52,13 @@ export default function Booking() {
           <div className="w-20 h-20 rounded-full gold-gradient flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="text-black w-10 h-10" />
           </div>
-          <h2 className="text-3xl font-display font-bold text-white mb-4">Afspraak Bevestigd!</h2>
+          <h2 className="text-3xl font-display font-bold text-white mb-4">Aanvraag Verstuurd!</h2>
           <p className="text-white/70 mb-8">
-            Bedankt voor je boeking. Je ontvangt binnen enkele minuten een bevestiging per e-mail.<br />
+            We hebben je aanvraag geopend in WhatsApp. Bevestig het bericht om de afspraak definitief te maken.<br />
             <span className="text-gold-500 font-bold">Betaling vindt plaats in de salon.</span>
           </p>
           <button
-            onClick={() => { setIsSubmitted(false); setStep(1); setError(null); }}
+            onClick={() => { setIsSubmitted(false); setStep(1); }}
             className="w-full py-4 rounded-full gold-gradient text-black font-bold uppercase tracking-widest"
           >
             Nog een afspraak maken
@@ -117,13 +89,6 @@ export default function Booking() {
         </div>
 
         <div className="luxury-card p-8 md:p-12 rounded-3xl">
-          {error && (
-            <div className="mb-8 p-4 bg-red-500/10 border border-red-500/50 rounded-xl flex items-center gap-3 text-red-500">
-              <AlertCircle size={20} />
-              <p>{error}</p>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Progress Bar */}
             <div className="flex justify-between mb-12 relative">
@@ -211,14 +176,11 @@ export default function Booking() {
                       className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-gold-500 outline-none"
                     >
                       <option value="">Kies een tijdstip</option>
-                      {TIME_SLOTS.map((t) => {
-                        const isOccupied = occupiedSlots.includes(t);
-                        return (
-                          <option key={t} value={t} disabled={isOccupied}>
-                            {t} {isOccupied ? '(Bezet)' : ''}
-                          </option>
-                        );
-                      })}
+                      {TIME_SLOTS.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -291,10 +253,9 @@ export default function Booking() {
                   </button>
                   <button
                     type="submit"
-                    disabled={loading}
                     className="flex-1 py-4 rounded-full gold-gradient text-black font-bold uppercase tracking-widest flex items-center justify-center gap-2"
                   >
-                    {loading ? <Loader2 className="animate-spin" /> : 'Bevestig Boeking'}
+                    Bevestig via WhatsApp
                   </button>
                 </div>
                 <p className="text-center text-white/40 text-xs mt-4 uppercase tracking-widest">

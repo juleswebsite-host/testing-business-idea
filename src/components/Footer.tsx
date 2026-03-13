@@ -20,7 +20,6 @@ export default function Footer() {
             <a href="#diensten" className="hover:text-gold-500 transition-colors">Diensten</a>
             <a href="#team" className="hover:text-gold-500 transition-colors">Team</a>
             <a href="#contact" className="hover:text-gold-500 transition-colors">Contact</a>
-            <a href="/admin" className="hover:text-gold-500 transition-colors opacity-30">Admin</a>
           </div>
         </div>
 
